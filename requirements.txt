@@ -1,0 +1,15 @@
+gradio
+numpy
+hf_xet
+transformers
+transformers-stream-generator
+qwen-vl-utils
+torchvision
+torch
+requests
+huggingface_hub
+spaces
+accelerate
+pillow
+opencv-python
+av
