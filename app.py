@@ -101,11 +101,10 @@ def rescale_bounding_boxes(bounding_boxes, original_width, original_height, scal
 
 # Default system prompt for object detection
 default_system_prompt = (
-    "You are a helpful assistant to detect objects in images. When asked to detect elements based on a description, "
+    "You are a helpful assistant to detect objects in images. When asked to detect elements based on a description, Parse only the boxes; don't write unnecessary content."
     "you return bounding boxes for all elements in the form of [xmin, ymin, xmax, ymax] with the values being scaled "
     "to 512 by 512 pixels. When there are more than one result, answer with a list of bounding boxes in the form "
     "of [[xmin, ymin, xmax, ymax], [xmin, ymin, xmax, ymax], ...]."
-    "Parse only the boxes; don't write unnecessary content."
 )
 
 # Function for object detection
@@ -297,7 +296,7 @@ def generate_video(model_name: str, text: str, video_path: str,
         time.sleep(0.01)
         yield buffer, buffer
 
-# Define examples for image, video, and object detection inference
+# Define examples for image and video inference
 image_examples = [
     ["convert this page to doc [text] precisely for markdown.", "images/1.png"],
     ["convert this page to doc [table] precisely for markdown.", "images/2.png"],
@@ -310,9 +309,10 @@ video_examples = [
     ["explain the video in detail.", "videos/2.mp4"]
 ]
 
+# Define examples for object detection
 object_detection_examples = [
-    ["object/1.png", "detect red and yellow cars."],
-    ["object/2.png", "detect the white cat."]
+    ["Detect Spider-Man T-shirt.", "images/22.png"],
+    ["Detect Green Car.", "images/11.png"]
 ]
 
 # Added CSS to style the output area as a "Canvas"
@@ -356,22 +356,18 @@ with gr.Blocks(css=css, theme="bethecloud/storj_theme") as demo:
                 with gr.TabItem("Object Detection / Localization"):
                     with gr.Row():
                         with gr.Column():
-                            input_img = gr.Image(label="Input Image", type="pil")
+                            input_img = gr.Image(label="Input Image [ 1024x1024 ]", type="pil")
                             system_prompt = gr.Textbox(label="System Prompt", value=default_system_prompt, visible=False)
-                            text_input = gr.Textbox(label="Query Input")
+                            text_input = gr.Textbox(label="Query Input", placeholder="Enter query...")
                             submit_btn = gr.Button(value="Submit", elem_classes="submit-btn")
+                            gr.Examples(
+                                examples=object_detection_examples,
+                                inputs=[text_input, input_img]
+                            )
                         with gr.Column():
                             model_output_text = gr.Textbox(label="Model Output Text")
                             parsed_boxes = gr.Textbox(label="Parsed Boxes")
                             annotated_image = gr.Image(label="Annotated Image")
-
-                    gr.Examples(
-                        examples=object_detection_examples,
-                        inputs=[input_img, text_input],
-                        outputs=[model_output_text, parsed_boxes, annotated_image],
-                        fn=run_example,
-                        cache_examples=True,
-                    )
 
                     submit_btn.click(
                         fn=run_example,
@@ -393,7 +389,7 @@ with gr.Blocks(css=css, theme="bethecloud/storj_theme") as demo:
                 markdown_output = gr.Markdown(label="Formatted Result (Result.Md)")
 
             model_choice = gr.Radio(
-                choices=["Camel-Doc-OCR-062825", "OCRFlux-3B", "ShotVL-7B", "ViLaSR-7B"],
+                choices=["Camel-Doc-OCR-062825", "ViLaSR-7B", "OCRFlux-3B", "ShotVL-7B"],
                 label="Select Model",
                 value="Camel-Doc-OCR-062825"
             )
