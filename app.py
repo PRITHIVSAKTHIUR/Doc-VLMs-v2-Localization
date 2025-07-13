@@ -384,9 +384,11 @@ with gr.Blocks(css=css, theme="bethecloud/storj_theme") as demo:
 
         with gr.Column():
             with gr.Column(elem_classes="canvas-output"):
-                gr.Markdown("## Result.Md")
+                gr.Markdown("## Output")
                 output = gr.Textbox(label="Raw Output Stream", interactive=False, lines=2)
-                markdown_output = gr.Markdown(label="Formatted Result (Result.Md)")
+
+                with gr.Accordion("(Result.md)", open=False):                
+                    markdown_output = gr.Markdown(label="(Result.md)")
 
             model_choice = gr.Radio(
                 choices=["Camel-Doc-OCR-062825", "ViLaSR-7B", "OCRFlux-3B", "ShotVL-7B"],
